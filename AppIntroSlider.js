@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   StyleSheet,
   FlatList,
@@ -8,45 +8,76 @@ import {
   TouchableOpacity,
   Platform,
   StatusBar,
-  I18nManager,
-} from 'react-native';
-import DefaultSlide from './DefaultSlide';
+  I18nManager
+} from "react-native";
+import DefaultSlide from "./DefaultSlide";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
-const isIphoneX =
-  Platform.OS === 'ios' && !Platform.isPad && !Platform.isTVOS && (height === 812 || width === 812);
+const isIphoneX = Platform.OS === "ios" && !Platform.isPad && !Platform.isTVOS && (height === 812 || width === 812);
 
-const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android';
+const isAndroidRTL = I18nManager.isRTL && Platform.OS === "android";
 
 export default class AppIntroSlider extends React.Component {
   static defaultProps = {
     activeDotStyle: {
-      backgroundColor: 'rgba(255, 255, 255, .9)',
+      backgroundColor: "#F06181"
     },
     dotStyle: {
-      backgroundColor: 'rgba(0, 0, 0, .2)',
+      backgroundColor: "#FBFBFB"
     },
-    skipLabel: 'Skip',
-    doneLabel: 'Done',
-    nextLabel: 'Next',
-    prevLabel: 'Back',
+    skipLabel: "Skip",
+    doneLabel: "Done",
+    nextLabel: "Next",
+    prevLabel: "Back",
     buttonStyle: null,
     buttonTextStyle: null,
     paginationStyle: null,
     showDoneButton: true,
     showNextButton: true,
+    autoPlay: true,
+    autoPlayInterval: 4000
   };
   state = {
     width,
     height,
-    activeIndex: 0,
+    activeIndex: 0
+  };
+
+  componentWillMount() {
+    if (this.props.autoPlay && this.props.autoPlayInterval) {
+      this.autoPlayHandler = setInterval(this._handlerAutoPlay, this.props.autoPlayInterval);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.autoPlayHandler) {
+      clearInterval(this.autoPlayHandler);
+    }
+  }
+
+  _handlerAutoPlay = () => {
+    const { slides } = this.props;
+    const { activeIndex } = this.state;
+    if (Array.isArray(slides) && slides.length > 1) {
+      const length = slides.length;
+      let index = activeIndex + 1 * (this.scrollLeftToRight ? 1 : -1);
+      if (index > length - 1) {
+        this.scrollLeftToRight = false;
+        index = length - 1;
+      } else if (index < 0) {
+        this.scrollLeftToRight = true;
+        index = 0;
+      }
+
+      this.goToSlide(index);
+    }
   };
 
   goToSlide = pageNum => {
     this.setState({ activeIndex: pageNum });
     this.flatList.scrollToOffset({
-      offset: this._rtlSafeIndex(pageNum) * this.state.width,
+      offset: this._rtlSafeIndex(pageNum) * this.state.width
     });
   };
 
@@ -55,20 +86,17 @@ export default class AppIntroSlider extends React.Component {
 
   _onNextPress = () => {
     this.goToSlide(this.state.activeIndex + 1);
-    this.props.onSlideChange &&
-      this.props.onSlideChange(this.state.activeIndex + 1, this.state.activeIndex);
+    this.props.onSlideChange && this.props.onSlideChange(this.state.activeIndex + 1, this.state.activeIndex);
   };
   _onPrevPress = () => {
     this.goToSlide(this.state.activeIndex - 1);
-    this.props.onSlideChange &&
-      this.props.onSlideChange(this.state.activeIndex - 1, this.state.activeIndex);
+    this.props.onSlideChange && this.props.onSlideChange(this.state.activeIndex - 1, this.state.activeIndex);
   };
 
-  _onPaginationPress = (index) => {
+  _onPaginationPress = index => {
     const activeIndexBeforeChange = this.state.activeIndex;
     this.goToSlide(index);
-    this.props.onSlideChange &&
-      this.props.onSlideChange(index, activeIndexBeforeChange);
+    this.props.onSlideChange && this.props.onSlideChange(index, activeIndexBeforeChange);
   };
 
   _renderItem = item => {
@@ -95,19 +123,17 @@ export default class AppIntroSlider extends React.Component {
 
   _renderDefaultButton = name => {
     let content = (
-      <Text style={[styles.buttonText, this.props.buttonTextStyle]}>
-        {this.props[`${name.toLowerCase()}Label`]}
-      </Text>
+      <Text style={[styles.buttonText, this.props.buttonTextStyle]}>{this.props[`${name.toLowerCase()}Label`]}</Text>
     );
     if (this.props.bottomButton) {
       content = (
         <View
           style={[
             styles.bottomButton,
-            (name === 'Skip' || name === 'Prev') && {
-              backgroundColor: 'transparent',
+            (name === "Skip" || name === "Prev") && {
+              backgroundColor: "transparent"
             },
-            this.props.buttonStyle,
+            this.props.buttonStyle
           ]}
         >
           {content}
@@ -118,39 +144,34 @@ export default class AppIntroSlider extends React.Component {
   };
 
   _renderOuterButton = (content, name, onPress) => {
-    const style =
-      name === 'Skip' || name === 'Prev' ? styles.leftButtonContainer : styles.rightButtonContainer;
+    const style = name === "Skip" || name === "Prev" ? styles.leftButtonContainer : styles.rightButtonContainer;
     return (
       <View style={!this.props.bottomButton && style}>
-        <TouchableOpacity
-          onPress={onPress}
-          style={this.props.bottomButton ? styles.flexOne : this.props.buttonStyle}
-        >
+        <TouchableOpacity onPress={onPress} style={this.props.bottomButton ? styles.flexOne : this.props.buttonStyle}>
           {content}
         </TouchableOpacity>
       </View>
     );
   };
 
-  _renderNextButton = () => this._renderButton('Next', this._onNextPress);
+  _renderNextButton = () => this._renderButton("Next", this._onNextPress);
 
-  _renderPrevButton = () => this._renderButton('Prev', this._onPrevPress);
+  _renderPrevButton = () => this._renderButton("Prev", this._onPrevPress);
 
-  _renderDoneButton = () => this._renderButton('Done', this.props.onDone && this.props.onDone);
+  _renderDoneButton = () => this._renderButton("Done", this.props.onDone && this.props.onDone);
 
-  _renderSkipButton = () =>
-    // scrollToEnd does not work in RTL so use goToSlide instead
-    this._renderButton('Skip', () =>
-      this.props.onSkip ? this.props.onSkip() : this.goToSlide(this.props.slides.length - 1)
-    );
+  // _renderSkipButton = () =>
+  //   // scrollToEnd does not work in RTL so use goToSlide instead
+  //   this._renderButton("Skip", () =>
+  //     this.props.onSkip ? this.props.onSkip() : this.goToSlide(this.props.slides.length - 1)
+  //   );
 
   _renderPagination = () => {
     const isLastSlide = this.state.activeIndex === this.props.slides.length - 1;
     const isFirstSlide = this.state.activeIndex === 0;
 
-    const skipBtn =
-      (!isFirstSlide && this._renderPrevButton()) || (!isLastSlide && this._renderSkipButton());
-    const btn = isLastSlide ? this._renderDoneButton() : this._renderNextButton();
+    // const skipBtn = (!isFirstSlide && this._renderPrevButton()) || (!isLastSlide && this._renderSkipButton());
+    // const btn = isLastSlide ? this._renderDoneButton() : this._renderNextButton();
 
     return (
       <View style={[styles.paginationContainer, this.props.paginationStyle]}>
@@ -161,16 +182,14 @@ export default class AppIntroSlider extends React.Component {
                 key={i}
                 style={[
                   styles.dot,
-                  this._rtlSafeIndex(i) === this.state.activeIndex
-                    ? this.props.activeDotStyle
-                    : this.props.dotStyle,
+                  this._rtlSafeIndex(i) === this.state.activeIndex ? this.props.activeDotStyle : this.props.dotStyle
                 ]}
                 onPress={() => this._onPaginationPress(i)}
               />
             ))}
         </View>
-        {btn}
-        {skipBtn}
+        {/* {btn} */}
+        {/* {skipBtn} */}
       </View>
     );
   };
@@ -194,7 +213,7 @@ export default class AppIntroSlider extends React.Component {
   };
 
   _onLayout = () => {
-    const { width, height } = Dimensions.get('window');
+    const { width, height } = Dimensions.get("window");
     if (width !== this.state.width || height !== this.state.height) {
       // Set new width to update rendering of pages
       this.setState({ width, height });
@@ -202,13 +221,22 @@ export default class AppIntroSlider extends React.Component {
       const func = () => {
         this.flatList.scrollToOffset({
           offset: this._rtlSafeIndex(this.state.activeIndex) * width,
-          animated: false,
+          animated: false
         });
       };
-      Platform.OS === 'android' ? setTimeout(func, 0) : func();
+      Platform.OS === "android" ? setTimeout(func, 0) : func();
     }
   };
 
+  _renderSkipButton = () => {
+    const { skipButtonTextStyle, skipButtonStyle } = this.props;
+    return (
+      <TouchableOpacity style={styles.skipButton} onPress={this.props.onSkip} activeOpacity={0.7}>
+        <View style={styles.skipButtonMask} />
+        <Text style={[styles.skipButtonText, skipButtonTextStyle]}>Skip</Text>
+      </TouchableOpacity>
+    );
+  };
   render() {
     // Separate props used by the component to props passed to FlatList
     const {
@@ -243,6 +271,7 @@ export default class AppIntroSlider extends React.Component {
           {...otherProps}
         />
         {!hidePagination && this._renderPagination()}
+        {this._renderSkipButton()}
       </View>
     );
   }
@@ -250,49 +279,82 @@ export default class AppIntroSlider extends React.Component {
 
 const styles = StyleSheet.create({
   flexOne: {
-    flex: 1,
+    flex: 1
+  },
+  skipButtonText: {
+    fontSize: 16,
+    color: "red",
+    zIndex: 2
+  },
+  skipButton: {
+    position: "absolute",
+    bottom: isIphoneX ? 34 : 17,
+    right: 25,
+    width: 68,
+    height: 68,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 2,
+    elevation: 2
+  },
+  skipButtonMask: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 68 / 2,
+    backgroundColor: "white",
+    opacity: 0.8,
+    ...Platform.select({
+      ios: {
+        shadowColor: "rgba(186,187,188,0.04)",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 1,
+        shadowRadius: 3
+      },
+      android: {
+        elevation: 2
+      }
+    })
   },
   flatList: {
     flex: 1,
-    flexDirection: isAndroidRTL ? 'row-reverse' : 'row',
+    flexDirection: isAndroidRTL ? "row-reverse" : "row"
   },
   paginationContainer: {
-    position: 'absolute',
-    bottom: 16 + (isIphoneX ? 34 : 0),
+    position: "absolute",
+    top: 17 + (isIphoneX ? 34 : 0),
     left: 16,
-    right: 16,
+    right: 16
   },
   paginationDots: {
     height: 16,
     margin: 16,
-    flexDirection: isAndroidRTL ? 'row-reverse' : 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: isAndroidRTL ? "row-reverse" : "row",
+    justifyContent: "center",
+    alignItems: "center"
   },
   dot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    marginHorizontal: 4,
+    marginHorizontal: 4
   },
   leftButtonContainer: {
-    position: 'absolute',
-    left: 0,
+    position: "absolute",
+    left: 0
   },
   rightButtonContainer: {
-    position: 'absolute',
-    right: 0,
+    position: "absolute",
+    right: 0
   },
   bottomButton: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, .3)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(0, 0, 0, .3)",
+    alignItems: "center",
+    justifyContent: "center"
   },
   buttonText: {
-    backgroundColor: 'transparent',
-    color: 'white',
+    backgroundColor: "transparent",
+    color: "white",
     fontSize: 18,
-    padding: 12,
-  },
+    padding: 12
+  }
 });
