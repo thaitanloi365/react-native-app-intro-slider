@@ -24,7 +24,7 @@ export default class AppIntroSlider extends React.Component {
       backgroundColor: "#F06181"
     },
     dotStyle: {
-      backgroundColor: "#FBFBFB"
+      backgroundColor: "#FAFAFA"
     },
     skipLabel: "Skip",
     doneLabel: "Done",
@@ -154,8 +154,6 @@ export default class AppIntroSlider extends React.Component {
     );
   };
 
-  _renderNextButton = () => this._renderButton("Next", this._onNextPress);
-
   _renderPrevButton = () => this._renderButton("Prev", this._onPrevPress);
 
   _renderDoneButton = () => this._renderButton("Done", this.props.onDone && this.props.onDone);
@@ -188,6 +186,7 @@ export default class AppIntroSlider extends React.Component {
               />
             ))}
         </View>
+        {this._renderSkipButton()}
         {/* {btn} */}
         {/* {skipBtn} */}
       </View>
@@ -231,12 +230,22 @@ export default class AppIntroSlider extends React.Component {
   _renderSkipButton = () => {
     const { skipButtonTextStyle, skipButtonStyle } = this.props;
     return (
-      <TouchableOpacity style={styles.skipButton} onPress={this.props.onSkip} activeOpacity={0.7}>
-        <View style={styles.skipButtonMask} />
-        <Text style={[styles.skipButtonText, skipButtonTextStyle]}>Skip</Text>
+      <TouchableOpacity style={skipButtonStyle} onPress={this.props.onSkip} activeOpacity={0.7}>
+        <Text style={[styles.nextButtonText, skipButtonTextStyle]}>Skip</Text>
       </TouchableOpacity>
     );
   };
+
+  _renderNextButton = () => {
+    const { nextButtonTextStyle, nextButtonStyle } = this.props;
+    return (
+      <TouchableOpacity style={[styles.nextButton, nextButtonStyle]} onPress={this._onNextPress} activeOpacity={0.7}>
+        <View style={styles.skipButtonMask} />
+        <Text style={[styles.skipButtonText, nextButtonTextStyle]}>Next</Text>
+      </TouchableOpacity>
+    );
+  };
+
   render() {
     // Separate props used by the component to props passed to FlatList
     const {
@@ -271,7 +280,7 @@ export default class AppIntroSlider extends React.Component {
           {...otherProps}
         />
         {!hidePagination && this._renderPagination()}
-        {this._renderSkipButton()}
+        {this._renderNextButton()}
       </View>
     );
   }
@@ -281,12 +290,17 @@ const styles = StyleSheet.create({
   flexOne: {
     flex: 1
   },
+  nextButtonText: {
+    fontSize: 14,
+    color: "red",
+    zIndex: 2
+  },
   skipButtonText: {
     fontSize: 16,
     color: "red",
     zIndex: 2
   },
-  skipButton: {
+  nextButton: {
     position: "absolute",
     bottom: isIphoneX ? 34 : 17,
     right: 25,
@@ -321,12 +335,14 @@ const styles = StyleSheet.create({
   paginationContainer: {
     position: "absolute",
     top: 17 + (isIphoneX ? 34 : 0),
-    left: 16,
-    right: 16
+    left: 30,
+    right: 25,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   paginationDots: {
     height: 16,
-    margin: 16,
     flexDirection: isAndroidRTL ? "row-reverse" : "row",
     justifyContent: "center",
     alignItems: "center"

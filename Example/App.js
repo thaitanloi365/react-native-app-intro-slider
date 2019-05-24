@@ -33,38 +33,57 @@ const styles = StyleSheet.create({
 
 const slides = [
   {
-    image: require("./assets/appIntro1.png")
+    image: require("./assets/appIntro1.png"),
+    bgImage: require("./assets/appIntroBg1.png")
   },
   {
-    image: require("./assets/appIntro2.png")
+    image: require("./assets/appIntro2.png"),
+    bgImage: require("./assets/appIntroBg2.png")
   },
   {
-    image: require("./assets/appIntro3.png")
+    image: require("./assets/appIntro3.png"),
+    bgImage: require("./assets/appIntroBg3.png")
   },
   {
-    image: require("./assets/appIntro4.png")
+    image: require("./assets/appIntro4.png"),
+    bgImage: require("./assets/appIntroBg4.png")
   },
   {
-    image: require("./assets/appIntro5.png")
+    image: require("./assets/appIntro5.png"),
+    bgImage: require("./assets/appIntroBg5.png")
   },
   {
-    image: require("./assets/appIntro6.png")
+    image: require("./assets/appIntro6.png"),
+    bgImage: require("./assets/appIntroBg6.png")
   },
   {
-    image: require("./assets/appIntro7.png")
+    image: require("./assets/appIntro7.png"),
+    bgImage: require("./assets/appIntroBg7.png")
   },
   {
-    image: require("./assets/appIntro8.png")
+    image: require("./assets/appIntro8.png"),
+    bgImage: require("./assets/appIntroBg8.png")
   }
 ];
 
 export default class App extends React.Component {
-  _renderItem = props => <ImageBackground style={{ width: "100%", height: "100%" }} source={props.image} />;
+  _renderItem = props => (
+    <ImageBackground style={{ width: "100%", height: "100%" }} source={props.bgImage}>
+      <ImageBackground
+        resizeMode="cover"
+        style={{ ...StyleSheet.absoluteFillObject, top: 40, backgroundColor: "transparent" }}
+        source={props.image}
+      />
+    </ImageBackground>
+  );
 
   render() {
     return (
       <AppIntroSlider
         slides={slides}
+        dotStyle={{
+          backgroundColor: "#FAFAFA"
+        }}
         renderItem={this._renderItem}
         // bottomButton
         // showPrevButton={false}
