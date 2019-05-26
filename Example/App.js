@@ -84,6 +84,7 @@ export default class App extends React.Component {
         dotStyle={{
           backgroundColor: "#FAFAFA"
         }}
+        onSkip={() => console.log("skip")}
         renderItem={this._renderItem}
         // bottomButton
         // showPrevButton={false}

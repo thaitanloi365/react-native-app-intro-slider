@@ -85,8 +85,14 @@ export default class AppIntroSlider extends React.Component {
   getListRef = () => this.flatList;
 
   _onNextPress = () => {
-    this.goToSlide(this.state.activeIndex + 1);
-    this.props.onSlideChange && this.props.onSlideChange(this.state.activeIndex + 1, this.state.activeIndex);
+    if (this.state.activeIndex === this.props.slides.length - 1) {
+      if (this.props.onSkip) {
+        this.props.onSkip();
+      }
+    } else {
+      this.goToSlide(this.state.activeIndex + 1);
+      this.props.onSlideChange && this.props.onSlideChange(this.state.activeIndex + 1, this.state.activeIndex);
+    }
   };
   _onPrevPress = () => {
     this.goToSlide(this.state.activeIndex - 1);
@@ -334,7 +340,7 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     position: "absolute",
-    top: 17 + (isIphoneX ? 34 : 0),
+    top: 17 + (isIphoneX ? 34 : 20),
     left: 30,
     right: 25,
     flexDirection: "row",
