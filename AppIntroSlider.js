@@ -246,7 +246,6 @@ export default class AppIntroSlider extends React.Component {
     const { nextButtonTextStyle, nextButtonStyle } = this.props;
     return (
       <TouchableOpacity style={[styles.nextButton, nextButtonStyle]} onPress={this._onNextPress} activeOpacity={0.7}>
-        <View style={styles.skipButtonMask} />
         <Text style={[styles.skipButtonText, nextButtonTextStyle]}>Next</Text>
       </TouchableOpacity>
     );
@@ -315,7 +314,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 2,
-    elevation: 2
+    elevation: 2,
+    backgroundColor: "white"
   },
   skipButtonMask: {
     ...StyleSheet.absoluteFillObject,
